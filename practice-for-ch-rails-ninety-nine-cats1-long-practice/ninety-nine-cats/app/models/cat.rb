@@ -1,12 +1,14 @@
-class Cat < ApplicationRecord
-    CAT_COLORS = ["White", "Black", "Ginger", "Grey", "Brown", "Tabby"]
+require 'action_view'
 
-    validates :birth_date, :color, :name, :sex, presence: true
-    validates :sex, inclusion:{ in: %w(M, F),
-        message: "%{value} is not a valid sex" }
-    validates :color, inclusion:{ in: CAT_COLORS.map(&:to_s),
-        message: "%{value} is not a valid color"}
-    validates birth_date_cannot_be_future
+class Cat < ApplicationRecord
+    include ActionView::Helpers::DateHelper
+    
+    CAT_COLORS = ["White", "Black", "Ginger", "Grey", "Brown", "Tabby"].freeze
+
+    validates :color, inclusion: CAT_COLORS
+    validates :sex, inclusion: %w[M F]
+    validates :birth_date, :name, presence: true
+    validate :birth_date_cannot_be_future
 
     def birth_date_cannot_be_future
         if birth_date > Date.today
